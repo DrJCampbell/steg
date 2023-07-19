@@ -1,6 +1,12 @@
 # my stuff
 R/setup_dev_env.R
 .DS_Store
+.Rhistory
+R/.DS_Store
+man/.DS_Store
+#  ..Rcheck
+
+
 
 # History files
 .Rhistory
