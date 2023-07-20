@@ -4,6 +4,7 @@ R/setup_dev_env.R
 .Rhistory
 R/.DS_Store
 man/.DS_Store
+notes_on_package_creation.qmd
 #  ..Rcheck
 
 
