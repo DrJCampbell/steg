@@ -38,10 +38,10 @@ image = read_original_image(file = example_image_file)
 
 # Generate a pseudorandom string of bits using the sha256 algorithm seeded with the key
 # The hashes are cypher-block-chained to produce as many bits as there are pixels in the image
-key_bits = process_key(key = "Use_a_really_good_key_here", image = image)
+key_bits = create_key_bits(key = "Use_a_really_good_key_here", image = image)
 
 # Create an image containing the message to be hidden
-message = make_message_image(
+message = create_message_image(
   file = "message.png",
   message = "You can replace this message with up to 122 characters that will be written in a png file",
   image = image
