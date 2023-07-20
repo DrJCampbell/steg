@@ -7,7 +7,7 @@
 create_message_image(
   file = "message.png",
   message = "This is the\\nmessage",
-  photo
+  image
 )
 }
 \arguments{
@@ -15,7 +15,7 @@ create_message_image(
 
 \item{message}{The text to inlude in the image}
 
-\item{photo}{The matrix containing the original image bits}
+\item{image}{The matrix containing the original image bits}
 }
 \value{
 A matrix containing pixel data for the message image

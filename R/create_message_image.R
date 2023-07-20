@@ -2,7 +2,7 @@
 #'
 #' @param file A file for the PNG to be written to
 #' @param message The text to inlude in the image
-#' @param photo The matrix containing the original image bits
+#' @param image The matrix containing the original image bits
 #'
 #' @return A matrix containing pixel data for the message image
 #' @export
@@ -10,12 +10,12 @@
 #' @examples
 #' photo <- matrix(0, ncol=500, nrow=500)
 #' message_bits <- create_message_image(file = "message.png", message = "This is the\nmessage", photo)
-create_message_image = function(file = "message.png", message = "This is the\nmessage", photo){
+create_message_image = function(file = "message.png", message = "This is the\nmessage", image){
 
   # add new lines every... 14 chars? allow a maximum 112 chars
   message = gsub("(.{14})", "\\1\n", message, perl = T)
 
-  grDevices::png(file, width = ncol(photo), height = nrow(photo))
+  grDevices::png(file, width = ncol(image), height = nrow(image))
   graphics::par(mai = c(0,0,0,0))
   plot(
     NULL, NULL,
