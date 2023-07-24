@@ -2,7 +2,10 @@
 
 export(create_key_bits)
 export(create_message_image)
+export(hide_message)
 export(plot_decrypted_image)
 export(read_encrypted_image)
 export(read_original_image)
+export(reveal_message)
+export(show_image_layer)
 export(write_encrypted_image)

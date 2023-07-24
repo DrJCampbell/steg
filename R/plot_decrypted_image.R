@@ -12,5 +12,5 @@ plot_decrypted_image = function(plain_text){
   flipped = t(plain_text)
   flipped = flipped[,ncol(flipped):1]
   graphics::par(mai = c(0,0,0,0))
-  graphics::image(flipped)
+  graphics::image(flipped, col=c("#000000", "#FFFFFF"))
 }
