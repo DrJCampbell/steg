@@ -22,9 +22,87 @@ You can install the development version of steg from
 devtools::install_github("DrJCampbell/steg")
 ```
 
+## How this works
+
+There are two main functions available - `hide_message()` and
+`reveal_message()`. These functions are convenience wrappers around a
+set of functions that together, process image data to store a message in
+the least-significant bit of a Portable Network Graphic (PNG) image file
+or reverse that process.
+
+The PNG format is lossless, so data stored in a PNG file can be restored
+bit-for-bit as it were, prior to encoding.
+
+The least significant bit of a pixel in a PNG image file has an
+imperceptible effect on how human eyes view the image. Because of this,
+we can modify the least-significant bit of an image without it having a
+noticible effect to the human eye. We can consider this image to be the
+host of the message we want to hide
+
+We can create an image file where a message in text format has been
+written in monochrome. The bits of this image are either fully on, or
+fully off. We can take the binary on/off value of these bits and hide
+them in least significant bit of the host image without a human being
+able to see the change to the host image.
+
+If we were to examine individual bits of an image where the
+least-significant bit encoded a message in image form, we would be able
+to see the message clearly. To help mitigate this possibility, we can
+encrypt the message bits with a key that is equal in length to the
+message images bits, using a Vernam cipher.
+
+To encypt a message image with a key using a Vernam cipher, we use the
+`xor()` function on the corresponding image and message bits. This
+process is reversible, such that if we use the `xor()` function on the
+encrypted resulting bit with the corresponding kit bit, we will recover
+the original message bit. As long at the key bits are apparently random
+(and never reused), the Vernam cipher is *probably* uncrackable.
+
+To generate a stream of (hopefully enough) psuedo-random bits, we take a
+user-supplied key as text and use the SHA256 algorithm to create a hash
+of this key. We then use the resulting hash to create a new hash using
+the first hash result as the input. This hash result is appended to the
+existing hash. This process is repeated, with the result of the previous
+concatenated hashes used as the input for the next hash and appending to
+the previous results, until enough bits have been accumulated match the
+host image.
+
+The least significant bit of the host image is replaced with the result
+of the `xor()` function using the binary value of the message-image bit
+and the bit of the corresponding bit-stream derived from the SHA256
+cipher-block-chain (CBC) of the original key.
+
+## Caveats
+
+The effect of using a Vernam cipher on a stream of bits from a message
+and cryptographic key derived from a CBC of a key is fairly obvious
+compared to the original image. To explore this, a function called
+`show_image_layer()` is provided that allows visualisation of the bits
+at each position in an 8-bit image.
+
 ## Example
 
-This is a basic example which shows you how to solve a common problem:
+The simplest use of this package involves the following
+
+``` r
+library(steg)
+
+# Hide a message
+hide_message(
+  image=system.file("extdata", "John_Tukey.png", package = "steg"),
+  key="Use_a_really_good_key_here",
+  message"You can replace this message with up to 122 characters that will be written in a png file",
+  crypto_image"crypto.png"
+  )
+
+# Reveal a message
+reveal_message(
+  key="Use_a_really_good_key_here",
+  crypto_image="crypto_image.png")
+```
+
+You can also perform the individual steps used to hide or reveal a
+message using the following functions.
 
 ``` r
 
@@ -37,7 +115,7 @@ example_image_file = system.file("extdata", "John_Tukey.png", package = "steg")
 image = read_original_image(file = example_image_file)
 
 # Generate a pseudorandom string of bits using the sha256 algorithm seeded with the key
-# The hashes are cypher-block-chained to produce as many bits as there are pixels in the image
+# The hashes are cipher-block-chained to produce as many bits as there are pixels in the image
 key_bits = create_key_bits(key = "Use_a_really_good_key_here", image = image)
 
 # Create an image containing the message to be hidden
@@ -57,4 +135,14 @@ plain_text = read_encrypted_image("crypto.png", key_bits = key_bits)
 
 # Plot the decrypted data to view the message
 plot_decrypted_image(plain_text)
+```
+
+Finally, you can explore the individual bit-layers of any image using
+the following function.
+
+``` r
+show_image_layer(
+  file='crypto_image.png',
+  layer=1
+  )
 ```
