@@ -34,7 +34,13 @@ create_message_image = function(file = "message.png", message = "This is the\nme
   )
   grDevices::dev.off()
   x = png::readPNG(file)
+  # Convert floats into integer values equivalent to the bits
   x = x * 255
-  x = x[,,1]
+  # sum across the RGB channels
+  x = x[,,1] + x[,,2] + x[,,3]
+  # covert the  merged RGB values back to the range of ~0:255
+  x = x / 3
+  # truncate the merged values - don't want any above 255
+  x = trunc(x)
   return(x)
 }
