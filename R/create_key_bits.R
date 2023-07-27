@@ -10,7 +10,8 @@
 #' # Assuming we have already created photo using `read_original_image()`
 #' # key_bits = create_key_bits(key = "This_is_the_key", image = photo)
 create_key_bits = function(key, image){
-  required_length = length(as.numeric(image))
+  # get the number of pixels in a single channel.
+  required_length = dim(image)[1] * dim(image)[2]
   # Get 512 bits per hash
   number_extra_hashes = (required_length %/% 512)
   digest = digest::digest(key, "sha256", serialize = FALSE)

@@ -68,9 +68,10 @@ library(steg)
 hide_message(
   image=system.file("extdata", "John_Tukey.png", package = "steg"),
   key="Use_a_really_good_key_here",
-  message"You can replace this message with up to 122 characters that will be written in a png file",
-  crypto_image"crypto.png"
+  message="You can replace this message with up to 122 characters that will be written in a png file",
+  crypto_image="crypto_image.png"
   )
+
 
 # Reveal a message
 reveal_message(
@@ -110,7 +111,7 @@ crypto = write_encrypted_image("crypto.png", message, image, key_bits = key_bits
 
 # The crypto.png file could be sent to a third party. If they also know the key, they
 # will be able to decrypt the message
-plain_text = read_encrypted_image("crypto.png", key_bits = key_bits)
+plain_text = read_encrypted_image("crypto_image.png", key_bits = key_bits)
 
 # Plot the decrypted data to view the message
 plot_decrypted_image(plain_text)
