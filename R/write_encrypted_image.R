@@ -3,14 +3,14 @@
 #' @param file The file to write the encrypted photo to
 #' @param message The message matrix from create_message_image()
 #' @param image The photo to hide the message in, from read_original_image()
-#' @param key_bits The key for encryption
+#' @param key The key for encryption
 #'
 #' @return A matrix with the encrypted message hidden in the image pixel values
 #' @export
 #'
 #' @examples
 #' # write_encrypted_image(file, message, image, key_bits)
-write_encrypted_image = function(file, message, image, key_bits){
+write_encrypted_image = function(file, message, image, key){
   # for each element in the message and image matrices,
   # get the value as bits. Consider the least two sig
   # bits and xor them. Store the result in the least
@@ -31,16 +31,22 @@ write_encrypted_image = function(file, message, image, key_bits){
       )
     )
   }
-  # modify the
+  # Generate a pseudorandom string of bits using the sha256 algorithm seeded with the key
+  # The hashes are cypher-block-chained to produce as many bits as there are pixels in the image
+  key_bits = create_key_bits(key = key, image = image)
+  # create a channel selection for hoping between RGB channels
   if(!is.na(dim(image)[3])){
-    channel_select = matrix(
-      rep(
-        c(1,2,3),
-        times=(length(as.numeric(image)) / dim(image)[3])
-      )[1:(dim(image)[1] * dim(image)[2])],
-      nrow=nrow(image)
-    )
+    if(dim(image)[3] > 2){
+      channel_select = create_channel_select(image, key)
+    }
   }
+
+  # Thoughts on flipping bits, integers or floats...
+  # Alternative idea -> used this one
+  # * when reading a 16 bit image
+  # * do the conversion to 8 bits in read_original_image
+
+
   for(r in 1:nrow(image)){
     for(c in 1:ncol(image)){
       # convert values to bits
@@ -53,14 +59,15 @@ write_encrypted_image = function(file, message, image, key_bits){
         image_bits = intToBits(image[r,c, channel_select[r,c]])
       }
 
+      # Modification involves xoring the least significant bit of the
+      # image with the top bit of the message
 
-      # xor the last bit of the message with
-      # the last bit of the image
       image_bits[1] = xor(message_bits[1],key_bits[r,c])
       # convert the image_bits back to range 0:1
       # store the result in the last bit of
       # the image
-      modified_bit = packBits(image_bits, type = "integer") / 255
+      #modified_bit = packBits(image_bits, type = "integer") / bitdepth
+      modified_bit = packBits(image_bits, type = "integer")
       if(is.na(dim(image)[3])){
         image[r,c] = modified_bit
       } else {
@@ -68,6 +75,7 @@ write_encrypted_image = function(file, message, image, key_bits){
       }
     }
   }
+  image = image / 255
   png::writePNG(
     image,
     target = file

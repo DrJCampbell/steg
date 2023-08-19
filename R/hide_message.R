@@ -20,10 +20,6 @@ hide_message = function(image, key, message, crypto_image){
   # Read the example image photo into a matrix of bits
   image = read_original_image(file = image)
 
-  # Generate a pseudorandom string of bits using the sha256 algorithm seeded with the key
-  # The hashes are cypher-block-chained to produce as many bits as there are pixels in the image
-  key_bits = create_key_bits(key = key, image = image)
-
   # Create an image containing the message to be hidden
   message = create_message_image(
     file = "message.png",
@@ -32,6 +28,6 @@ hide_message = function(image, key, message, crypto_image){
   )
 
   # Hide the message in the image and write out as a png file
-  crypto = write_encrypted_image(crypto_image, message, image, key_bits = key_bits)
+  crypto = write_encrypted_image(crypto_image, message, image, key = key)
   return(NULL)
 }
